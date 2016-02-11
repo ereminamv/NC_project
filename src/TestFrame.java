@@ -22,7 +22,7 @@ public class TestFrame extends JFrame {
 
 
     public void createGUI() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
@@ -84,43 +84,21 @@ public class TestFrame extends JFrame {
             textField3.setText(e.getActionCommand());
         }
     }
-    public void create(String filename) throws IOException {
-        File file = new File(filename);
-        try {
-            //проверяем, что если файл не существует то создаем его
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
 
     public String read(String fileName) {
         StringBuilder sb = new StringBuilder();
         File file = new File(fileName);
-        file.exists();
-        try {
-            BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()));
+
+        try (BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()))) {
             String s;
-            try {
-                while ((s = in.readLine()) != null) {
-                    if(s.length()!= 0){
-                        sb.append(s);
-                        sb.append("\n");
-                        System.out.println("S: " + s.length());
-                    }
+            while ((s = in.readLine()) != null) {
+                if(s.length()!= 0){
+                    sb.append(s);
+                    sb.append("\n");
                 }
-
-                in.close();
-            } catch (IOException ex) {
-
             }
-
-        } catch (FileNotFoundException ex) {
-
+        } catch (IOException ex) {
+            System.out.println("File not found");
         }
         return sb.toString();
     }
@@ -168,12 +146,6 @@ public class TestFrame extends JFrame {
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
-                try {
-                    frame.create(frame.filename);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
             }
         });
     }

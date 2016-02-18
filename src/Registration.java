@@ -1,9 +1,9 @@
 
 public class Registration
 {
-    String outcoming_call;
-    String entry_call;
-    int delta_balance;
+    private String outcoming_call;
+    private String entry_call;
+    protected int delta_balance;
 
 
 }

@@ -1,10 +1,19 @@
+import javafx.stage.FileChooser;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.io.File;
+import java.lang.*;
+import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 public class TestFrame extends JFrame {
@@ -14,11 +23,60 @@ public class TestFrame extends JFrame {
     private JTextField textField3;
     private String filename = "Number_base.txt";
 
+    File[] roots =  File.listRoots();
+    JList list = new JList(roots);
+    File root = (File) list.getSelectedValue();
+    File[] children = root.listFiles();
+    File file = new File("C:/test.txt");
+
+
 
     public TestFrame() {
         super("Test frame");
+
         createGUI();
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+
+        final JPanel rootContent = new JPanel();
+        rootContent.setLayout(new BoxLayout(rootContent, BoxLayout.Y_AXIS));
+        final JScrollPane rootContentScroll = new JScrollPane(rootContent);
+        File[] roots = File.listRoots();
+        final JList list = new JList(roots);
+        list.setVisibleRowCount(5);
+
+        list.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                rootContent.removeAll();
+                File root = (File) list.getSelectedValue();
+                File[] children = root.listFiles();
+                if (children != null) {
+                    for (int i = 0; i < children.length; i++) {
+                        JLabel label = new JLabel(children[i].getName());
+                        rootContent.add(label);
+                    }
+                }
+                rootContent.repaint();
+                rootContentScroll.revalidate();
+            }
+        });
+
+        mainPanel.add(new JScrollPane(list), BorderLayout.NORTH);
+        mainPanel.add(rootContentScroll, BorderLayout.CENTER);
+
+        getContentPane().add(mainPanel);
+
+        setPreferredSize(new Dimension(260, 220));
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+
     }
+
+
 
 
     public void createGUI() {
@@ -67,6 +125,7 @@ public class TestFrame extends JFrame {
         });
 
 
+
         button3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 textField2.setText(e.getActionCommand());
@@ -77,17 +136,20 @@ public class TestFrame extends JFrame {
         setPreferredSize(new Dimension(500, 500));
     }
 
+
+
     public class TestActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             textField1.setText(e.getActionCommand());
             textField2.setText(e.getActionCommand());
             textField3.setText(e.getActionCommand());
+
         }
     }
 
-    public String read(String fileName) {
+    public String read(String newText) {
         StringBuilder sb = new StringBuilder();
-        File file = new File(fileName);
+        File file = new File(filename);
 
         try (BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()))) {
             String s;
@@ -104,19 +166,18 @@ public class TestFrame extends JFrame {
     }
 
     public static void write(String fileName, String text) {
-        //Определяем файл
+
         File file = new File(fileName);
 
         try {
-            //PrintWriter обеспечит возможности записи в файл
+
             PrintWriter out = new PrintWriter(file.getAbsoluteFile());
 
             try {
-                //Записываем текст у файл
+
                 out.println(text);
             } finally {
-                //После чего мы должны закрыть файл
-                //Иначе файл не запишется
+
                 out.close();
             }
         } catch (IOException e) {
@@ -131,12 +192,13 @@ public class TestFrame extends JFrame {
         String oldFile = read(new TestFrame().filename);
 
         sb.append(oldFile);
-        // write(EmployeeUI.filename, sb.toString());
+
         sb.append(newText);
 
         write(new TestFrame().filename, sb.toString());
         System.out.println(file.length());
     }
+
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {

@@ -1,3 +1,4 @@
+package ru.UNCedu.phonebook;
 
 public class Registration
 {
